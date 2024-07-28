@@ -11,12 +11,9 @@ public class Main {
     System.out.println("Logs from your program will appear here!");
     try {
       ServerSocket serverSocket = new ServerSocket(4221);
-
-      // Since the tester restarts your program quite often, setting SO_REUSEADDR
-      // ensures that we don't run into 'Address already in use' errors
       serverSocket.setReuseAddress(true);
 
-      Socket socket = serverSocket.accept(); // Wait for connection from client.
+      Socket socket = serverSocket.accept();
       System.out.println("accepted new connection");
       try (BufferedReader reader =
               new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -35,11 +32,16 @@ public class Main {
           httpResponse.addHeader("Content-Type", "text/plain");
           httpResponse.addHeader("Content-Length", "" + str.length());
           writer.write(httpResponse.getResponseString());
-          writer.flush();
 
           System.out.println(httpResponse.getResponseString());
+        } else if (url.equals("/")) {
+          httpResponse.setStatus(200);
+          httpResponse.setStatusDescr("OK");
+          writer.write(httpResponse.getResponseString());
         } else {
-          writer.write("HTTP/1.1 404 Not Found\r\n\r\n");
+          httpResponse.setStatus(404);
+          httpResponse.setStatusDescr("Not Found");
+          writer.write(httpResponse.getResponseString());
         }
         writer.flush();
       }
