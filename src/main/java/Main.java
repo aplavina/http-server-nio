@@ -37,6 +37,7 @@ public class Main {
             httpResponse.setStatus(200);
             httpResponse.setStatusDescr("OK");
             httpResponse.setBody(httpRequest.getHeaders().get("User-Agent"));
+            httpResponse.addHeader("Content-Type", "text/plain");
           } else {
             httpResponse.setStatus(400);
             httpResponse.setStatusDescr("User-Agent header must be specified");
