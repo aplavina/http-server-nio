@@ -28,21 +28,24 @@ public class Main {
           String prefix = "/echo";
           String str = url.substring(prefix.length() + 1);
           httpResponse.setBody(str);
-
           httpResponse.addHeader("Content-Type", "text/plain");
-          httpResponse.addHeader("Content-Length", "" + str.length());
-          writer.write(httpResponse.getResponseString());
-
-          System.out.println(httpResponse.getResponseString());
         } else if (url.equals("/")) {
           httpResponse.setStatus(200);
           httpResponse.setStatusDescr("OK");
-          writer.write(httpResponse.getResponseString());
+        } else if (url.equals("/user-agent")) {
+          if (httpRequest.getHeaders().containsKey("User-Agent")) {
+            httpResponse.setStatus(200);
+            httpResponse.setStatusDescr("OK");
+            httpResponse.setBody(httpRequest.getHeaders().get("User-Agent"));
+          } else {
+            httpResponse.setStatus(400);
+            httpResponse.setStatusDescr("User-Agent header must be specified");
+          }
         } else {
           httpResponse.setStatus(404);
           httpResponse.setStatusDescr("Not Found");
-          writer.write(httpResponse.getResponseString());
         }
+        writer.write(httpResponse.getResponseString());
         writer.flush();
       }
     } catch (IOException e) {
