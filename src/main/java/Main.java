@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.StringTokenizer;
 
 public class Main {
   public static void main(String[] args) {
@@ -23,11 +22,22 @@ public class Main {
               new BufferedReader(new InputStreamReader(socket.getInputStream()));
           BufferedWriter writer =
               new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); ) {
-        StringTokenizer tokenizer = new StringTokenizer(reader.readLine());
-        String requestType = tokenizer.nextToken();
-        String url = tokenizer.nextToken();
-        if (url.equals("/")) {
-          writer.write("HTTP/1.1 200 OK\r\n\r\n");
+        HttpRequest httpRequest = new HttpRequest(reader);
+        String url = httpRequest.getUrl();
+        HttpResponse httpResponse = new HttpResponse();
+        if (url.startsWith("/echo")) {
+          httpResponse.setStatus(200);
+          httpResponse.setStatusDescr("OK");
+          String prefix = "/echo";
+          String str = url.substring(prefix.length() + 1);
+          httpResponse.setBody(str);
+
+          httpResponse.addHeader("Content-Type", "text/plain");
+          httpResponse.addHeader("Content-Length", "" + str.length());
+          writer.write(httpResponse.getResponseString());
+          writer.flush();
+
+          System.out.println(httpResponse.getResponseString());
         } else {
           writer.write("HTTP/1.1 404 Not Found\r\n\r\n");
         }
