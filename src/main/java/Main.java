@@ -29,6 +29,7 @@ public class Main {
           String str = url.substring(prefix.length() + 1);
           httpResponse.setBody(str);
           httpResponse.addHeader("Content-Type", "text/plain");
+          httpResponse.addHeader("Content-Length", "" + str.length());
         } else if (url.equals("/")) {
           httpResponse.setStatus(200);
           httpResponse.setStatusDescr("OK");
@@ -38,6 +39,8 @@ public class Main {
             httpResponse.setStatusDescr("OK");
             httpResponse.setBody(httpRequest.getHeaders().get("User-Agent"));
             httpResponse.addHeader("Content-Type", "text/plain");
+            httpResponse.addHeader(
+                "Content-Length", "" + httpRequest.getHeaders().get("User-Agent").length());
           } else {
             httpResponse.setStatus(400);
             httpResponse.setStatusDescr("User-Agent header must be specified");
