@@ -56,13 +56,17 @@ public class NioHttpServer {
     } catch (IOException ex) {
       ex.printStackTrace();
     } finally {
-      for (SocketChannel client : clients) {
-        try (client) {
-          clients.remove(client);
-          clientsMessages.remove(client);
-          messagesLength.remove(client);
+      Iterator<SocketChannel> iterator = clients.iterator();
+      while (iterator.hasNext()) {
+        SocketChannel client = iterator.next();
+        try {
+          client.close();
         } catch (IOException ex) {
           ex.printStackTrace();
+        } finally {
+          iterator.remove();
+          clientsMessages.remove(client);
+          messagesLength.remove(client);
         }
       }
     }
