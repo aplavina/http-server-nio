@@ -1,3 +1,5 @@
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -32,7 +34,8 @@ public class SimpleHandler implements HttpRequestHandler {
       httpResponse.setBody(body);
       httpResponse.addHeader("Content-Type", "text/plain");
       httpResponse.addHeader("Content-Length", "" + body.length());
-    } else if (request.getUrl().startsWith("/files/")) {
+    } else if (request.getType() == HttpRequest.RequestType.GET
+        && request.getUrl().startsWith("/files/")) {
       try {
         httpResponse.setStatus(200);
         httpResponse.setStatusDescr("OK");
@@ -45,6 +48,26 @@ public class SimpleHandler implements HttpRequestHandler {
         ex.printStackTrace();
         httpResponse.setStatus(404);
         httpResponse.setStatusDescr("Not Found");
+      }
+    } else if (request.getType() == HttpRequest.RequestType.POST
+        && request.getUrl().startsWith("/files/")) {
+      String path = directoryPath + "/" + request.getUrl().split("/files/")[1];
+      String body = request.getBody();
+      try {
+        File file = new File(path);
+        if (file.createNewFile()) {
+          try (FileWriter myWriter = new FileWriter(path); ) {
+            myWriter.write(body);
+            httpResponse.setStatus(201);
+            httpResponse.setStatusDescr("Created");
+          }
+        } else {
+          httpResponse.setStatus(500);
+          httpResponse.setStatusDescr("Internal Server Error");
+        }
+      } catch (IOException e) {
+        System.out.println("An error occurred.");
+        e.printStackTrace();
       }
     } else {
       httpResponse.setStatus(404);
