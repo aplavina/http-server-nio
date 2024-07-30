@@ -43,8 +43,8 @@ public class SimpleHandler implements HttpRequestHandler {
         httpResponse.addHeader("Content-Length", "" + body.length());
       } catch (IOException ex) {
         ex.printStackTrace();
-        httpResponse.setStatus(500);
-        httpResponse.setStatusDescr("Internal Server Error");
+        httpResponse.setStatus(404);
+        httpResponse.setStatusDescr("Not Found");
       }
     } else {
       httpResponse.setStatus(404);
