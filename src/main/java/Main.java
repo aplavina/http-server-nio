@@ -10,7 +10,7 @@ public class Main {
   public static void main(String[] args) {
     NioHttpServer server =
         new NioHttpServer(
-            s -> "HTTP/1.1 200 OK\r\nContent-Type: None\r\nContent-Length: 0\r\n\r\n", 4221);
+            s -> "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 0\r\n\r\n", 4221);
     server.start();
   }
 }
