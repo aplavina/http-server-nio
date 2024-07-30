@@ -8,13 +8,8 @@ public class Main {
         break;
       }
     }
-
-    if (directoryPath != null) {
-      HttpRequestHandler handler = new SimpleHandler(directoryPath);
-      NioHttpServer server = new NioHttpServer(handler, 4221);
-      server.start();
-    } else {
-      System.err.println("No directory path provided");
-    }
+    HttpRequestHandler handler = new SimpleHandler(directoryPath == null ? "" : directoryPath);
+    NioHttpServer server = new NioHttpServer(handler, 4221);
+    server.start();
   }
 }
