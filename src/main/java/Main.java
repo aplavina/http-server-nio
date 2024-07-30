@@ -8,11 +8,8 @@ import java.net.Socket;
 
 public class Main {
   public static void main(String[] args) {
-    NioHttpServer server =
-        new NioHttpServer(
-            s ->
-                "HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: 19\r\n\r\nraspberry/pineapple",
-            4221);
+    HttpRequestHandler handler = new SimpleHandler();
+    NioHttpServer server = new NioHttpServer(handler, 4221);
     server.start();
   }
 }

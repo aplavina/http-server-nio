@@ -51,6 +51,32 @@ public class HttpRequest {
     }
   }
 
+  public HttpRequest(String requestStr) {
+    String[] lines = requestStr.split("\r\n");
+
+    String initialLine = lines[0];
+    StringTokenizer tokenizer = new StringTokenizer(initialLine);
+    type = RequestType.valueOf(tokenizer.nextToken());
+    url = tokenizer.nextToken();
+
+    headers = new HashMap();
+    int i = 1;
+    for (; i < lines.length; ++i) {
+      String line = lines[i];
+      if (line.isEmpty()) {
+        break;
+      }
+      String[] header = line.split(":");
+      headers.put(header[0].trim(), header[1].trim());
+    }
+
+    if (headers.containsKey("Content-Length")) {
+      body = requestStr.split("\r\n\r\n")[1];
+    } else {
+      body = "";
+    }
+  }
+
   public RequestType getType() {
     return type;
   }
