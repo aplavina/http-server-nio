@@ -15,45 +15,41 @@ public class SimpleHandler implements HttpRequestHandler {
   @Override
   public String handle(String requestStr) {
     HttpRequest request = new HttpRequest(requestStr);
-    HttpResponse httpResponse = new HttpResponse();
+    HttpResponse response = new HttpResponse();
 
     if (request.getUrl().equals("/")) {
-      httpResponse.setStatus(200);
-      httpResponse.setStatusDescr("OK");
+      response.setStatus(200);
+      response.setStatusDescr("OK");
     } else if (request.getUrl().equals("/user-agent")) {
-      httpResponse.setStatus(200);
-      httpResponse.setStatusDescr("OK");
+      response.setStatus(200);
+      response.setStatusDescr("OK");
       String body = request.getHeaders().get("User-Agent");
-      httpResponse.setBody(body);
-      httpResponse.addHeader("Content-Type", "text/plain");
-      httpResponse.addHeader("Content-Length", "" + body.length());
+      response.setBody(body);
+      response.addHeader("Content-Type", "text/plain");
+      response.addHeader("Content-Length", "" + body.length());
     } else if (request.getUrl().startsWith("/echo/")) {
-      if (request.getHeaders().get("Accept-Encoding") != null
-          && request.getHeaders().get("Accept-Encoding").equals("gzip")) {
-        httpResponse.addHeader("Content-Encoding", "gzip");
-      }
-
-      httpResponse.setStatus(200);
-      httpResponse.setStatusDescr("OK");
+      handleCompression(request, response);
+      response.setStatus(200);
+      response.setStatusDescr("OK");
 
       final String body = request.getUrl().split("/echo/")[1];
-      httpResponse.setBody(body);
-      httpResponse.addHeader("Content-Type", "text/plain");
-      httpResponse.addHeader("Content-Length", "" + body.length());
+      response.setBody(body);
+      response.addHeader("Content-Type", "text/plain");
+      response.addHeader("Content-Length", "" + body.length());
     } else if (request.getType() == HttpRequest.RequestType.GET
         && request.getUrl().startsWith("/files/")) {
       try {
-        httpResponse.setStatus(200);
-        httpResponse.setStatusDescr("OK");
+        response.setStatus(200);
+        response.setStatusDescr("OK");
         String file = directoryPath + "/" + request.getUrl().split("/files/")[1];
         String body = Files.readString(Paths.get(file), StandardCharsets.UTF_8);
-        httpResponse.setBody(body);
-        httpResponse.addHeader("Content-Type", "application/octet-stream");
-        httpResponse.addHeader("Content-Length", "" + body.length());
+        response.setBody(body);
+        response.addHeader("Content-Type", "application/octet-stream");
+        response.addHeader("Content-Length", "" + body.length());
       } catch (IOException ex) {
         ex.printStackTrace();
-        httpResponse.setStatus(404);
-        httpResponse.setStatusDescr("Not Found");
+        response.setStatus(404);
+        response.setStatusDescr("Not Found");
       }
     } else if (request.getType() == HttpRequest.RequestType.POST
         && request.getUrl().startsWith("/files/")) {
@@ -64,21 +60,32 @@ public class SimpleHandler implements HttpRequestHandler {
         if (file.createNewFile()) {
           try (FileWriter myWriter = new FileWriter(path); ) {
             myWriter.write(body);
-            httpResponse.setStatus(201);
-            httpResponse.setStatusDescr("Created");
+            response.setStatus(201);
+            response.setStatusDescr("Created");
           }
         } else {
-          httpResponse.setStatus(500);
-          httpResponse.setStatusDescr("Internal Server Error");
+          response.setStatus(500);
+          response.setStatusDescr("Internal Server Error");
         }
       } catch (IOException e) {
         System.out.println("An error occurred.");
         e.printStackTrace();
       }
     } else {
-      httpResponse.setStatus(404);
-      httpResponse.setStatusDescr("Not Found");
+      response.setStatus(404);
+      response.setStatusDescr("Not Found");
     }
-    return httpResponse.getResponseString();
+    return response.getResponseString();
+  }
+
+  private void handleCompression(HttpRequest request, HttpResponse response) {
+    if (request.getHeaders().get("Accept-Encoding") != null) {
+      String[] encodings = request.getHeaders().get("Accept-Encoding").split(", ");
+      for (String encoding : encodings) {
+        if (encoding.equals("gzip")) {
+          response.addHeader("Content-Encoding", "gzip");
+        }
+      }
+    }
   }
 }
