@@ -28,8 +28,14 @@ public class SimpleHandler implements HttpRequestHandler {
       httpResponse.addHeader("Content-Type", "text/plain");
       httpResponse.addHeader("Content-Length", "" + body.length());
     } else if (request.getUrl().startsWith("/echo/")) {
+      if (request.getHeaders().get("Accept-Encoding") != null
+          && request.getHeaders().get("Accept-Encoding").equals("gzip")) {
+        httpResponse.addHeader("Content-Encoding", "gzip");
+      }
+
       httpResponse.setStatus(200);
       httpResponse.setStatusDescr("OK");
+
       final String body = request.getUrl().split("/echo/")[1];
       httpResponse.setBody(body);
       httpResponse.addHeader("Content-Type", "text/plain");
