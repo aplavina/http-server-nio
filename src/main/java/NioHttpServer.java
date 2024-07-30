@@ -174,8 +174,4 @@ public class NioHttpServer {
     System.out.println(
         "Registered client " + client.socket().getInetAddress() + ":" + client.socket().getPort());
   }
-
-  public static void main(String[] args) {
-    new NioHttpServer(new SimpleHandler(), 4221).start();
-  }
 }

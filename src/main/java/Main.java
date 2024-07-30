@@ -1,15 +1,20 @@
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-
 public class Main {
   public static void main(String[] args) {
-    HttpRequestHandler handler = new SimpleHandler();
-    NioHttpServer server = new NioHttpServer(handler, 4221);
-    server.start();
+    String directoryPath = null;
+
+    for (int i = 0; i < args.length; i++) {
+      if ("--directory".equals(args[i]) && i + 1 < args.length) {
+        directoryPath = args[i + 1];
+        break;
+      }
+    }
+
+    if (directoryPath != null) {
+      HttpRequestHandler handler = new SimpleHandler(directoryPath);
+      NioHttpServer server = new NioHttpServer(handler, 4221);
+      server.start();
+    } else {
+      System.err.println("No directory path provided");
+    }
   }
 }
