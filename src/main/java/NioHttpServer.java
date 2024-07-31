@@ -139,8 +139,7 @@ public class NioHttpServer {
     System.out.println("Full Message With Body: " + request);
     clientsMessages.remove(client);
     messagesLength.remove(client);
-    String response = requestHandler.handle(request);
-    byte[] responseBytes = response.getBytes();
+    byte[] responseBytes = requestHandler.handle(request);
     int offset = 0;
     buffer.clear();
     while (offset < responseBytes.length) {

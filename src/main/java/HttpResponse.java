@@ -1,11 +1,19 @@
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
 
 public class HttpResponse {
   private Integer status;
   private String statusDescr;
   private Map<String, String> headers = new HashMap();
-  private String body;
+  private byte[] body;
+
+  private static final int COMPRESSION_BUFFER_SIZE = 1024;
 
   public int getStatus() {
     return status;
@@ -23,11 +31,11 @@ public class HttpResponse {
     this.statusDescr = statusDescr;
   }
 
-  public String getBody() {
+  public byte[] getBody() {
     return body;
   }
 
-  public void setBody(String body) {
+  public void setBody(byte[] body) {
     this.body = body;
   }
 
@@ -35,7 +43,29 @@ public class HttpResponse {
     headers.put(key, value);
   }
 
-  public String getResponseString() {
+  public void compressBody() throws IOException {
+    if (body == null) {
+      System.out.println("Trying to encode null body");
+      return;
+    }
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    gzip(new ByteArrayInputStream(body), os);
+    byte[] compressed = os.toByteArray();
+    this.body = compressed;
+  }
+
+  public static void gzip(InputStream is, OutputStream os) throws IOException {
+    GZIPOutputStream gzipOs = new GZIPOutputStream(os);
+    byte[] buffer = new byte[COMPRESSION_BUFFER_SIZE];
+    int bytesRead = 0;
+    while ((bytesRead = is.read(buffer)) > -1) {
+      gzipOs.write(buffer, 0, bytesRead);
+    }
+    gzipOs.close();
+  }
+
+  public byte[] getResponseByteArray() {
     StringBuilder sb = new StringBuilder();
     if (status == null || statusDescr == null) {
       throw new IllegalStateException("Response status or description not set");
@@ -54,8 +84,16 @@ public class HttpResponse {
         });
     sb.append("\r\n");
     if (body != null) {
-      sb.append(body);
+      byte[] headersBytes = sb.toString().getBytes();
+      byte[] res = new byte[headersBytes.length + body.length];
+      for (int i = 0; i < headersBytes.length; ++i) {
+        res[i] = headersBytes[i];
+      }
+      for (int i = headersBytes.length; i < res.length; ++i) {
+        res[i] = body[i - headersBytes.length];
+      }
+      return res;
     }
-    return sb.toString();
+    return sb.toString().getBytes();
   }
 }

@@ -1,3 +1,3 @@
 public interface HttpRequestHandler {
-  String handle(String request);
+  byte[] handle(String request);
 }

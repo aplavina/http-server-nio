@@ -1,0 +1,25 @@
+[33md367dcf[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m compressing
+[33mbc46023[m multiple encodings
+[33m9a74dbc[m check encoding
+[33ma336ad3[m load files
+[33m105a32d[m fix
+[33mc2abc27[m fix
+[33mf721194[m files
+[33m240eba6[m fix
+[33m3b1652f[m fix
+[33ma3a007c[m fix
+[33m4355d90[m send body user-agent
+[33m9baa351[m response body
+[33m8915bf0[m text/plain content type
+[33m3e28742[m headers for response
+[33m2e5f74c[m nio server
+[33m686f4f1[m fix
+[33m3a3341d[m fix
+[33ma3ccc4f[m user-agent endpoint added
+[33m189ba48[m 200 status for / request
+[33m71e3512[m echo
+[33m95ed04e[m chtcking url
+[33mad208f4[m response
+[33mc89ac35[m uncommented code in Main
+[33ma80f0f1[m test
+[33m3517fa3[m init [skip ci]
